@@ -16,6 +16,7 @@ ScreenGui.Name = "FE_PremiumResizeHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = pGui
 
+-- Panel Principal
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 280, 0, 240)
 MainFrame.Position = UDim2.new(0.5, -140, 0.4, -120)
@@ -27,7 +28,6 @@ MainFrame.Parent = ScreenGui
 
 local UIStroke = Instance.new("UIStroke")
 UIStroke.Thickness = 2.5
-UIStroke.Color = Color3.fromRGB(0, 150, 255)
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 UIStroke.Parent = MainFrame
 
@@ -35,19 +35,25 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 12)
 MainCorner.Parent = MainFrame
 
--- Botón Ocultar/Mostrar
+-- Botón Ocultar/Mostrar (IGUAL AL GUI PRINCIPAL)
 local ToggleButton = Instance.new("TextButton")
-ToggleButton.Size = UDim2.new(0, 90, 0, 32)
+ToggleButton.Size = UDim2.new(0, 100, 0, 35)
 ToggleButton.Position = UDim2.new(0, 15, 0, 15)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 16, 22) -- Mismo fondo oscuro
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.Text = "OCULTAR"
 ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.TextSize = 12
+ToggleButton.BorderSizePixel = 0
 ToggleButton.Parent = ScreenGui
 
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Thickness = 2.5
+ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+ToggleStroke.Parent = ToggleButton
+
 local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim.new(0, 8)
+ToggleCorner.CornerRadius = UDim.new(0, 12) -- Mismo redondeado
 ToggleCorner.Parent = ToggleButton
 
 -- Componentes de Texto
@@ -88,7 +94,7 @@ local RoundButton = Instance.new("UICorner")
 RoundButton.CornerRadius = UDim.new(1, 0)
 RoundButton.Parent = SliderButton
 
--- Entrada Manual e Input
+-- Entrada Manual
 local TextBox = Instance.new("TextBox")
 TextBox.Size = UDim2.new(0, 110, 0, 35)
 TextBox.Position = UDim2.new(0, 25, 0, 115)
@@ -133,13 +139,13 @@ local ResetCorner = Instance.new("UICorner")
 ResetCorner.CornerRadius = UDim.new(0, 8)
 ResetCorner.Parent = ResetBtn
 
--- 2. ANIMACIÓN RGB WAVE DEL BORDE
-local isMenuRainbowActive = true
+-- 2. ANIMACIÓN RGB WAVE SIMULTÁNEA (AMBOS CONTORNOS)
 RunService.RenderStepped:Connect(function()
-    if isMenuRainbowActive and MainFrame.Visible then
-        local hue = (tick() % 4) / 4
-        UIStroke.Color = Color3.fromHSV(hue, 1, 1)
-    end
+    local hue = (tick() % 4) / 4
+    local dynamicColor = Color3.fromHSV(hue, 1, 1)
+    
+    UIStroke.Color = dynamicColor
+    ToggleStroke.Color = dynamicColor -- El botón flotante ahora brilla en perfecta sincronía
 end)
 
 -- Animaciones Hover simples
@@ -147,7 +153,7 @@ local function setHover(btn, hCol, nCol)
     btn.MouseEnter:Connect(function() btn.BackgroundColor3 = hCol end)
     btn.MouseLeave:Connect(function() btn.BackgroundColor3 = nCol end)
 end
-setHover(ToggleButton, Color3.fromRGB(0, 150, 255), Color3.fromRGB(0, 120, 255))
+setHover(ToggleButton, Color3.fromRGB(25, 27, 38), Color3.fromRGB(15, 16, 22))
 setHover(ApplyBtn, Color3.fromRGB(0, 190, 120), Color3.fromRGB(0, 160, 100))
 setHover(ResetBtn, Color3.fromRGB(220, 40, 70), Color3.fromRGB(180, 30, 50))
 
@@ -156,12 +162,8 @@ local function toggleMenu()
     MainFrame.Visible = not MainFrame.Visible
     if MainFrame.Visible then
         ToggleButton.Text = "OCULTAR"
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-        isMenuRainbowActive = true
     else
         ToggleButton.Text = "MOSTRAR"
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-        isMenuRainbowActive = false
     end
 end
 
