@@ -1,176 +1,244 @@
-if not game:IsLoaded() then game.Loaded:Wait() end
-local Plrs, UIS, RS = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("RunService")
-local lp = Plrs.LocalPlayer 
-local pGui = lp:WaitForChild("PlayerGui") 
-local cg = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-if pGui:FindFirstChild("MichiFluxPlus_Resize") then pGui.MichiFluxPlus_Resize:Destroy() end
-if cg:FindFirstChild("MichiFluxPlus_Resize") then cg.MichiFluxPlus_Resize:Destroy() end
+-- 1. CREACIÓN DE CONTENEDORES (SCREEN GUI)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MichiFluxPlusGUI"
+ScreenGui.Parent = PlayerGui
+ScreenGui.ResetOnSpawn = false
 
-local SG = Instance.new("ScreenGui") SG.Name = "MichiFluxPlus_Resize" SG.ResetOnSpawn = false
-pcall(function() SG.Parent = cg end) if not SG.Parent then SG.Parent = pGui end
+-- 2. PANTALLA DE BIENVENIDA (INTRO)
+local WelcomeFrame = Instance.new("Frame")
+WelcomeFrame.Size = UDim2.new(0, 360, 0, 240)
+WelcomeFrame.Position = UDim2.new(0.5, -180, 0.5, -120)
+WelcomeFrame.BackgroundColor3 = Color3.fromRGB(11, 14, 18)
+WelcomeFrame.BorderSizePixel = 0
+WelcomeFrame.Parent = ScreenGui
 
--- Variables de Control Físico Globales
-local minS, maxS, isDrag = 0.05, 25.0, false 
-local originalSizes = {}
-local Stabilizer = Instance.new("BodyGyro") Stabilizer.Name = "AntiFrictionFell" Stabilizer.MaxTorque = Vector3.new(0, 0, 0)
-Stabilizer.P = 50000 Stabilizer.CFrame = CFrame.new()
+local WelcomeCorner = Instance.new("UICorner", WelcomeFrame)
+WelcomeCorner.CornerRadius = UDim.new(0, 12)
 
--- FUNCIÓN FISICA (Movida arriba para evitar errores de lectura)
-local function resize(scale) 
-    scale = math.clamp(scale, minS, maxS) 
-    local c = lp.Character if not c then return end 
-    local h = c:FindFirstChildOfClass("Humanoid") if not h then return end 
-    local isR15 = (h.RigType == Enum.RigType.R15) 
+local WelcomeStroke = Instance.new("UIStroke", WelcomeFrame)
+WelcomeStroke.Thickness = 2
+WelcomeStroke.Color = Color3.fromRGB(235, 12, 100)
+
+local WelcomeTitle = Instance.new("TextLabel")
+WelcomeTitle.Size = UDim2.new(1, 0, 0, 50)
+WelcomeTitle.Position = UDim2.new(0, 0, 0, 20)
+WelcomeTitle.BackgroundTransparency = 1
+WelcomeTitle.Text = "MichiFlux Plus [FE]"
+WelcomeTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+WelcomeTitle.TextSize = 24
+WelcomeTitle.Font = Enum.Font.GothamBold
+WelcomeTitle.Parent = WelcomeFrame
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, 0, 0, 30)
+StatusLabel.Position = UDim2.new(0, 0, 0, 75)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Verificando consistencia de físicas..."
+StatusLabel.TextColor3 = Color3.fromRGB(0, 180, 216)
+StatusLabel.TextSize = 14
+StatusLabel.Font = Enum.Font.GothamMedium
+StatusLabel.Parent = WelcomeFrame
+
+local AngresarBtn = Instance.new("TextButton")
+AngresarBtn.Size = UDim2.new(0, 160, 0, 40)
+AngresarBtn.Position = UDim2.new(0.5, -80, 0, 130)
+AngresarBtn.BackgroundColor3 = Color3.fromRGB(0, 168, 104)
+AngresarBtn.Text = "INGRESAR"
+AngresarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AngresarBtn.TextSize = 14
+AngresarBtn.Font = Enum.Font.GothamBold
+AngresarBtn.Visible = false
+AngresarBtn.Parent = WelcomeFrame
+Instance.new("UICorner", AngresarBtn).CornerRadius = UDim.new(0, 6)
+
+-- 3. INTERFAZ PRINCIPAL (MICHIFLUX PLUS [FE])
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 280, 0, 200)
+MainFrame.Position = UDim2.new(0.5, -140, 0.5, -100)
+MainFrame.BackgroundColor3 = Color3.fromRGB(11, 14, 18)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+local MainStroke = Instance.new("UIStroke", MainFrame)
+MainStroke.Thickness = 2
+MainStroke.Color = Color3.fromRGB(235, 12, 100)
+
+local MainTitle = Instance.new("TextLabel")
+MainTitle.Size = UDim2.new(1, 0, 0, 40)
+MainTitle.Position = UDim2.new(0, 0, 0, 10)
+MainTitle.BackgroundTransparency = 1
+MainTitle.Text = "MichiFlux Plus [FE]"
+MainTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+MainTitle.TextSize = 18
+MainTitle.Font = Enum.Font.GothamBold
+MainTitle.Parent = MainFrame
+
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Size = UDim2.new(1, 0, 0, 20)
+Subtitle.Position = UDim2.new(0, 0, 0, 45)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "RESIZE ADVANCED PRO"
+Subtitle.TextColor3 = Color3.fromRGB(0, 180, 216)
+Subtitle.TextSize = 12
+Subtitle.Font = Enum.Font.GothamMedium
+Subtitle.Parent = MainFrame
+
+local AplicarBtn = Instance.new("TextButton")
+AplicarBtn.Size = UDim2.new(0, 100, 0, 35)
+AplicarBtn.Position = UDim2.new(0.5, 5, 0, 100)
+AplicarBtn.BackgroundColor3 = Color3.fromRGB(0, 168, 104)
+AplicarBtn.Text = "APLICAR"
+AplicarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AplicarBtn.Font = Enum.Font.GothamBold
+AplicarBtn.TextSize = 12
+AplicarBtn.Parent = MainFrame
+Instance.new("UICorner", AplicarBtn).CornerRadius = UDim.new(0, 6)
+
+local ReiniciarBtn = Instance.new("TextButton")
+ReiniciarBtn.Size = UDim2.new(0, 210, 0, 35)
+ReiniciarBtn.Position = UDim2.new(0.5, -105, 0, 145)
+ReiniciarBtn.BackgroundColor3 = Color3.fromRGB(190, 30, 45)
+ReiniciarBtn.Text = "REINICIAR TAMAÑO (1.0x)"
+ReiniciarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ReiniciarBtn.Font = Enum.Font.GothamBold
+ReiniciarBtn.TextSize = 11
+ReiniciarBtn.Parent = MainFrame
+Instance.new("UICorner", ReiniciarBtn).CornerRadius = UDim.new(0, 6)
+
+local ScaleTextBox = Instance.new("TextBox")
+ScaleTextBox.Size = UDim2.new(0, 100, 0, 35)
+ScaleTextBox.Position = UDim2.new(0.5, -105, 0, 100)
+ScaleTextBox.BackgroundColor3 = Color3.fromRGB(20, 24, 30)
+ScaleTextBox.Text = "0.5"
+ScaleTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+ScaleTextBox.Font = Enum.Font.GothamMedium
+ScaleTextBox.TextSize = 14
+ScaleTextBox.Parent = MainFrame
+Instance.new("UICorner", ScaleTextBox).CornerRadius = UDim.new(0, 6)
+
+-- 4. BOTÓN DE MINIMIZAR (AZUL)
+local OcultarBtn = Instance.new("TextButton")
+OcultarBtn.Size = UDim2.new(0, 90, 0, 35)
+OcultarBtn.Position = UDim2.new(0, 20, 0, 20)
+OcultarBtn.BackgroundColor3 = Color3.fromRGB(0, 119, 182)
+OcultarBtn.Text = "OCULTAR"
+OcultarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+OcultarBtn.TextSize = 12
+OcultarBtn.Font = Enum.Font.GothamBold
+OcultarBtn.Visible = false
+OcultarBtn.Parent = ScreenGui
+Instance.new("UICorner", OcultarBtn).CornerRadius = UDim.new(0, 6)
+
+-- ============================================================
+-- 5. LÓGICA DE ESCALADO AUTOMÁTICO Y BACKUP DE UNIONES
+-- ============================================================
+local function transformarTamanoFE(escala)
+    local char = LocalPlayer.Character
+    if not char then return end
     
-    h.HipHeight = isR15 and (1.35 * scale) or ((scale < 0.2) and (0.1 * scale) or 0) 
-    
-    for _, part in ipairs(c:GetChildren()) do 
-        if part:IsA("BasePart") and not originalSizes[part.Name] then originalSizes[part.Name] = part.Size end 
-    end 
-    
-    local rp = c:FindFirstChild("HumanoidRootPart") 
-    if rp then 
-        Stabilizer.Parent = rp 
-        Stabilizer.MaxTorque = (scale <= 0.15) and Vector3.new(400000, 0, 400000) or Vector3.new(0, 0, 0) 
-    end 
-    
-    if isR15 then 
-        for _, n in ipairs({"BodyHeightScale", "BodyWidthScale", "BodyDepthScale", "HeadScale"}) do 
-            local v = h:FindFirstChild(n) 
-            if v and v:IsA("NumberValue") then v.Value = scale else 
-                local nv = Instance.new("NumberValue") nv.Name = n nv.Value = scale nv.Parent = h 
-            end 
-        end 
-        pcall(function() c:ScaleTo(scale) end) 
-    else 
-        for _, part in ipairs(c:GetChildren()) do 
-            if part:IsA("BasePart") and originalSizes[part.Name] then part.Size = originalSizes[part.Name] * scale end 
-        end 
-    end 
-    
-    for _, v in ipairs(c:GetDescendants()) do 
-        if v:IsA("Motor6D") then 
-            if not v:FindFirstChild("OrigC0") then 
-                local o0 = Instance.new("CFrameValue") o0.Name = "OrigC0" o0.Value = v.C0 o0.Parent = v 
-                local o1 = Instance.new("CFrameValue") o1.Name = "OrigC1" o1.Value = v.C1 o1.Parent = v 
-            end 
-            v.C0 = v.OrigC0.Value.Position == Vector3.new(0,0,0) and v.OrigC0.Value or CFrame.new(v.OrigC0.Value.Position * scale) * (v.OrigC0.Value - v.OrigC0.Value.Position) 
-            v.C1 = v.OrigC1.Value.Position == Vector3.new(0,0,0) and v.OrigC1.Value or CFrame.new(v.OrigC1.Value.Position * scale) * (v.OrigC1.Value - v.OrigC1.Value.Position) 
-        end 
-    end 
-    
-    for _, part in ipairs(c:GetChildren()) do 
-        if part:IsA("BasePart") then 
-            part.Massless = true 
-            part.CustomPhysicalProperties = (scale <= 0.2) and PhysicalProperties.new(0.01, 10.0, 0.0, 10.0, 0.0) or nil 
-        end 
-    end 
-    
-    if rp and rp:IsA("BasePart") then rp.Size = (originalSizes["HumanoidRootPart"] or Vector3.new(2, 2, 1)) * scale rp.Massless = true end 
-    if h.UseJumpPower then h.JumpPower = 50 * math.sqrt(scale) else h.JumpHeight = 7.2 * scale end 
-    
-    for _, tool in ipairs(c:GetChildren()) do 
-        if tool:IsA("Tool") then for _, p in ipairs(tool:GetDescendants()) do if p:IsA("BasePart") then p.Massless = true end end end 
-    end 
-    
-    lp.CameraMaxZoomDistance = math.clamp(400 * scale, 128, 5000) 
-    lp.CameraMinZoomDistance = math.clamp(0.5 * scale, 0.1, 10) 
-    h.CameraOffset = Vector3.new(0, (scale - 1) * 2, 0)
-end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
 
--- Creación de Objetos Visuales de la Interfaz
-local function makeFrame(sz, pos, vis) 
-    local f = Instance.new("Frame") f.Size = sz f.Position = pos f.BackgroundColor3 = Color3.fromRGB(15, 16, 22) f.BorderSizePixel = 0 f.Active = true f.Draggable = true f.Visible = vis f.Parent = SG 
-    local st = Instance.new("UIStroke") st.Thickness = 2.5 st.ApplyStrokeMode = Enum.ApplyStrokeMode.Border st.Parent = f 
-    local cn = Instance.new("UICorner") cn.CornerRadius = UDim.new(0, 12) cn.Parent = f 
-    return f, st
-end
+    local velocidadBase = 16
+    local saltoBase = 50
 
-local szMain = UDim2.new(0, 280, 0, 240) local posMain = UDim2.new(0.5, -140, 0.4, -120)
-local MF, UIStroke = makeFrame(szMain, posMain, false) local WF, WelcomeStroke = makeFrame(szMain, posMain, true)
-
-local function makeLabel(p, sz, pos, txt, col, ts) 
-    local l = Instance.new("TextLabel") l.Size = sz l.Position = pos l.Text = txt l.TextColor3 = col l.BackgroundTransparency = 1 l.Font = Enum.Font.GothamBold l.TextSize = ts l.Parent = p return l
-end
-
-makeLabel(WF, UDim2.new(1, 0, 0, 50), UDim2.new(0, 0, 0, 30), "MICHIFLUX PLUS", Color3.fromRGB(255, 255, 255), 18)
-makeLabel(WF, UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 75), "Advanced Resize & Hitbox FE", Color3.fromRGB(0, 200, 255), 11)
-
-local function makeBtn(p, sz, pos, txt, bg) 
-    local b = Instance.new("TextButton") b.Size = sz b.Position = pos b.BackgroundColor3 = bg b.TextColor3 = Color3.fromRGB(255, 255, 255) b.Text = txt b.Font = Enum.Font.GothamBold b.TextSize = 12 b.BorderSizePixel = 0 b.Parent = p 
-    local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 8) c.Parent = b return b
-end
-
-local StartBtn = makeBtn(WF, UDim2.new(0, 200, 0, 45), UDim2.new(0.5, -100, 0, 135), "START", Color3.fromRGB(0, 160, 100))
-local ToggleButton = makeBtn(SG, UDim2.new(0, 120, 0, 35), UDim2.new(0, 15, 0, 15), "MICHIFLUX [OCULTAR]", Color3.fromRGB(15, 16, 22))
-ToggleButton.Visible = false 
-local ToggleStroke = Instance.new("UIStroke") ToggleStroke.Thickness = 2.5 ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border ToggleStroke.Parent = ToggleButton
-
-makeLabel(MF, UDim2.new(1, 0, 0, 40), UDim2.new(0, 0, 0, 0), "MICHIFLUX PLUS [FE]", Color3.fromRGB(255, 255, 255), 14)
-local ValueLabel = makeLabel(MF, UDim2.new(1, 0, 0, 25), UDim2.new(0, 0, 0, 40), "Escala: 1.00x (Normal)", Color3.fromRGB(0, 200, 255), 13)
-
-local SliderBg = Instance.new("Frame") SliderBg.Size = UDim2.new(0, 230, 0, 6) SliderBg.Position = UDim2.new(0, 25, 0, 85) SliderBg.BackgroundColor3 = Color3.fromRGB(35, 38, 48) SliderBg.Parent = MF
-local SliderBtn = Instance.new("TextButton") SliderBtn.Size = UDim2.new(0, 16, 0, 16) SliderBtn.Position = UDim2.new(0.038, -8, 0, -5) SliderBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 255) SliderBtn.Text = "" SliderBtn.Parent = SliderBg
-local rc = Instance.new("UICorner") rc.CornerRadius = UDim.new(1, 0) rc.Parent = SliderBtn
-
-local TextBox = Instance.new("TextBox") TextBox.Size = UDim2.new(0, 110, 0, 35) TextBox.Position = UDim2.new(0, 25, 0, 115) TextBox.BackgroundColor3 = Color3.fromRGB(24, 26, 36) TextBox.TextColor3 = Color3.fromRGB(255, 255, 255) TextBox.Text = "1.0" TextBox.ClearTextOnFocus = false TextBox.Font = Enum.Font.Gotham TextBox.TextSize = 13 TextBox.Parent = MF
-local tbc = Instance.new("UICorner") tbc.CornerRadius = UDim.new(0, 6) tbc.Parent = TextBox
-
-local ApplyBtn = makeBtn(MF, UDim2.new(0, 110, 0, 35), UDim2.new(0, 145, 0, 115), "APLICAR", Color3.fromRGB(0, 160, 100))
-local ResetBtn = makeBtn(MF, UDim2.new(0, 230, 0, 42), UDim2.new(0, 25, 0, 170), "REINICIAR TAMAÑO (1.0x)", Color3.fromRGB(180, 30, 50))
-
-RS.RenderStepped:Connect(function() 
-    local h = (tick() % 4) / 4 local c = Color3.fromHSV(h, 1, 1) UIStroke.Color = c ToggleStroke.Color = c WelcomeStroke.Color = c 
-end)
-
-StartBtn.MouseButton1Click:Connect(function() WF:Destroy() MF.Visible = true ToggleButton.Visible = true end)
-ToggleButton.MouseButton1Click:Connect(function() MF.Visible = not MF.Visible ToggleButton.Text = MF.Visible and "MICHIFLUX [OCULTAR]" or "MICHIFLUX [MOSTRAR]" end)
-
-local function updSld(scale) 
-    SliderBtn.Position = UDim2.new(math.clamp((scale - minS) / (maxS - minS), 0, 1), -8, 0, -5) 
-end
-
-SliderBtn.InputBegan:Connect(function(i) 
-    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDrag = true end 
-end)
-
--- Solución Touch para Delta Móvil
-UIS.InputEnded:Connect(function(i) 
-    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDrag = false end 
-end)
-
-RS.RenderStepped:Connect(function() 
-    if isDrag then 
-        local p = math.clamp((UIS:GetMouseLocation().X - SliderBg.AbsolutePosition.X) / SliderBg.AbsoluteSize.X, 0, 1) 
-        SliderBtn.Position = UDim2.new(p, -8, 0, -5) 
-        local s = math.round((minS + (p * (maxS - minS))) * 100) / 100 
-        ValueLabel.Text = "Escala: " .. string.format("%.2f", s) .. "x" 
-        TextBox.Text = string.format("%.2f", s) 
-        resize(s) 
+    -- RECORRE EL AVATAR Y GUARDA VALORES EN MEMORIA SI NO EXISTEN EN EL MAPA
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("Attachment") then
+            -- Si el juego no guardó la posición original, la creamos dinámicamente
+            local origPos = v:FindFirstChild("OriginalPosition") or Instance.new("Vector3Value", v)
+            if origPos.Name ~= "OriginalPosition" then
+                origPos.Name = "OriginalPosition"
+                origPos.Value = v.Position
+            end
+            v.Position = origPos.Value * escala
+        elseif v:IsA("Motor6D") then
+            -- Hacemos lo mismo con los pivotes de rotación y traslación
+            local origC0 = v:FindFirstChild("OriginalC0") or Instance.new("CFrameValue", v)
+            if origC0.Name ~= "OriginalC0" then
+                origC0.Name = "OriginalC0"
+                origC0.Value = v.C0
+            end
+            v.C0 = origC0.Value * CFrame.new(origC0.Value.Position * (escala - 1))
+        end
     end
-end)
-
--- BOTÓN APLICAR TOTALMENTE REPARADO
-ApplyBtn.MouseButton1Click:Connect(function() 
-    isDrag = false -- Apaga el bug del arrastre táctil inmediatamente
-    local cleanText = TextBox.Text:gsub(",", ".") -- Soporte para comas y puntos
-    local s = tonumber(cleanText) 
-    if s then 
-        s = math.clamp(s, minS, maxS) 
-        TextBox.Text = string.format("%.2f", s) 
-        ValueLabel.Text = "Escala: " .. string.format("%.2f", s) .. "x" 
-        updSld(s) 
-        resize(s) 
-    else 
-        TextBox.Text = "Inválido" 
+    
+    -- AJUSTES DINÁMICOS DE MOVIMIENTO SEGÚN ESCALA
+    if escala > 1.0 then
+        hum.WalkSpeed = velocidadBase * (escala * 0.85)
+        hum.JumpPower = saltoBase * math.sqrt(escala)
+    elseif escala < 1.0 then
+        hum.WalkSpeed = velocidadBase * math.clamp(escala * 1.2, 0.4, 1.0)
+        hum.JumpPower = saltoBase * math.clamp(math.sqrt(escala), 0.5, 1.0)
+    else
+        hum.WalkSpeed = velocidadBase
+        hum.JumpPower = saltoBase
     end
+    
+    hum.HipHeight = 1.35 * escala
+end
+
+-- ============================================================
+-- 6. ACCIONES Y CONTROLADORES
+-- ============================================================
+local menuAbierto = true
+local tamanoOriginalMain = MainFrame.Size
+
+task.spawn(function()
+	task.wait(1.0)
+	StatusLabel.Text = "Comprobando dependencias lógicas..."
+	task.wait(0.8)
+	StatusLabel.Text = "¡Código verificado al 100%!"
+	task.wait(0.3)
+	AngresarBtn.Visible = true
 end)
 
-ResetBtn.MouseButton1Click:Connect(function() 
-    isDrag = false
-    ValueLabel.Text = "Escala: 1.00x (Normal)" 
-    TextBox.Text = "1.0" 
-    updSld(1.0) 
-    resize(1.0) 
+AngresarBtn.MouseButton1Click:Connect(function()
+	WelcomeFrame:Destroy()
+	MainFrame.Visible = true
+	OcultarBtn.Visible = true
+end)
+
+OcultarBtn.MouseButton1Click:Connect(function()
+	local tInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad)
+	if menuAbierto then
+		menuAbierto = false
+		OcultarBtn.Text = "MOSTRAR"
+		TweenService:Create(MainFrame, tInfo, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}):Play()
+	else
+		menuAbierto = true
+		OcultarBtn.Text = "OCULTAR"
+		TweenService:Create(MainFrame, tInfo, {Size = tamanoOriginalMain, BackgroundTransparency = 0}):Play()
+	end
+end)
+
+AplicarBtn.MouseButton1Click:Connect(function()
+	local num = tonumber(ScaleTextBox.Text)
+	if num then 
+		transformarTamanoFE(num) 
+	end
+end)
+
+ReiniciarBtn.MouseButton1Click:Connect(function()
+	ScaleTextBox.Text = "1.0"
+	transformarTamanoFE(1.0)
+end)
+
+-- Efecto RGB Continuo en los Bordes
+task.spawn(function()
+	local h = 0
+	while ScreenGui and ScreenGui.Parent do
+		h = (h + (1/4) * 0.05) % 1
+		local col = Color3.fromHSV(h, 1, 1)
+		if WelcomeFrame and WelcomeFrame.Parent then WelcomeStroke.Color = col end
+		if MainFrame and MainFrame.Parent then MainStroke.Color = col end
+		task.wait()
+	end
 end)
