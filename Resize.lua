@@ -1,251 +1,91 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
-
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-
-local player = Players.LocalPlayer
-local pGui = player:WaitForChild("PlayerGui")
-
+local Plrs, UIS, RS = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("RunService")
+local lp = Plrs.LocalPlayer local pGui = lp:WaitForChild("PlayerGui")
+local cg = game:GetService("CoreGui")
 if pGui:FindFirstChild("MichiFluxPlus_Resize") then pGui.MichiFluxPlus_Resize:Destroy() end
-if game:GetService("CoreGui"):FindFirstChild("MichiFluxPlus_Resize") then game:GetService("CoreGui").MichiFluxPlus_Resize:Destroy() end
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MichiFluxPlus_Resize"
-ScreenGui.ResetOnSpawn = false
-
-pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end) 
-if not ScreenGui.Parent then ScreenGui.Parent = pGui end
-
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 280, 0, 240)
-MainFrame.Position = UDim2.new(0.5, -140, 0.4, -120)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 16, 22)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.Parent = ScreenGui
-
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Thickness = 2.5
-UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke.Parent = MainFrame
-
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 12)
-MainCorner.Parent = MainFrame
-
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Size = UDim2.new(0, 120, 0, 35)
-ToggleButton.Position = UDim2.new(0, 15, 0, 15)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 16, 22)
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.Text = "MICHIFLUX [OCULTAR]"
-ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.TextSize = 10
-ToggleButton.BorderSizePixel = 0
-ToggleButton.Parent = ScreenGui
-
-local ToggleStroke = Instance.new("UIStroke")
-ToggleStroke.Thickness = 2.5
-ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-ToggleStroke.Parent = ToggleButton
-
-local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim.new(0, 12)
-ToggleCorner.Parent = ToggleButton
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Text = "MICHIFLUX PLUS [FE]"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundTransparency = 1
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 14
-Title.Parent = MainFrame
-
-local ValueLabel = Instance.new("TextLabel")
-ValueLabel.Size = UDim2.new(1, 0, 0, 25)
-ValueLabel.Position = UDim2.new(0, 0, 0, 40)
-ValueLabel.Text = "Escala: 1.00x (Normal)"
-ValueLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
-ValueLabel.BackgroundTransparency = 1
-ValueLabel.Font = Enum.Font.GothamBold
-ValueLabel.TextSize = 13
-ValueLabel.Parent = MainFrame
-
-local SliderBackground = Instance.new("Frame")
-SliderBackground.Size = UDim2.new(0, 230, 0, 6)
-SliderBackground.Position = UDim2.new(0, 25, 0, 85)
-SliderBackground.BackgroundColor3 = Color3.fromRGB(35, 38, 48)
-SliderBackground.Parent = MainFrame
-
-local SliderButton = Instance.new("TextButton")
-SliderButton.Size = UDim2.new(0, 16, 0, 16)
-SliderButton.Position = UDim2.new(0.038, -8, 0, -5)
-SliderButton.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
-SliderButton.Text = ""
-SliderButton.Parent = SliderBackground
-
-local RoundButton = Instance.new("UICorner")
-RoundButton.CornerRadius = UDim.new(1, 0)
-RoundButton.Parent = SliderButton
-
-local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0, 110, 0, 35)
-TextBox.Position = UDim2.new(0, 25, 0, 115)
-TextBox.BackgroundColor3 = Color3.fromRGB(24, 26, 36)
-TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextBox.Text = "1.0"
-TextBox.ClearTextOnFocus = false
-TextBox.Font = Enum.Font.Gotham
-TextBox.TextSize = 13
-TextBox.Parent = MainFrame
-
-local TBCorner = Instance.new("UICorner")
-TBCorner.CornerRadius = UDim.new(0, 6)
-TBCorner.Parent = TextBox
-
-local ApplyBtn = Instance.new("TextButton")
-ApplyBtn.Size = UDim2.new(0, 110, 0, 35)
-ApplyBtn.Position = UDim2.new(0, 145, 0, 115)
-ApplyBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 100)
-ApplyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ApplyBtn.Text = "APLICAR"
-ApplyBtn.Font = Enum.Font.GothamBold
-ApplyBtn.TextSize = 12
-ApplyBtn.Parent = MainFrame
-
-local ApplyCorner = Instance.new("UICorner")
-ApplyCorner.CornerRadius = UDim.new(0, 6)
-ApplyCorner.Parent = ApplyBtn
-
-local ResetBtn = Instance.new("TextButton")
-ResetBtn.Size = UDim2.new(0, 230, 0, 42)
-ResetBtn.Position = UDim2.new(0, 25, 0, 170)
-ResetBtn.BackgroundColor3 = Color3.fromRGB(180, 30, 50)
-ResetBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ResetBtn.Text = "REINICIAR TAMAÑO (1.0x)"
-ResetBtn.Font = Enum.Font.GothamBold
-ResetBtn.TextSize = 12
-ResetBtn.Parent = MainFrame
-
-local ResetCorner = Instance.new("UICorner")
-ResetCorner.CornerRadius = UDim.new(0, 8)
-ResetCorner.Parent = ResetBtn
-
-RunService.RenderStepped:Connect(function()
-    local hue = (tick() % 4) / 4
-    local dynamicColor = Color3.fromHSV(hue, 1, 1)
-    UIStroke.Color = dynamicColor
-    ToggleStroke.Color = dynamicColor
-end)
-
-local function toggleMenu()
-    MainFrame.Visible = not MainFrame.Visible
-    ToggleButton.Text = MainFrame.Visible and "MICHIFLUX [OCULTAR]" or "MICHIFLUX [MOSTRAR]"
+if cg:FindFirstChild("MichiFluxPlus_Resize") then cg.MichiFluxPlus_Resize:Destroy() end
+local SG = Instance.new("ScreenGui") SG.Name = "MichiFluxPlus_Resize" SG.ResetOnSpawn = false
+pcall(function() SG.Parent = cg end) if not SG.Parent then SG.Parent = pGui end
+local function makeFrame(sz, pos, vis)
+    local f = Instance.new("Frame") f.Size = sz f.Position = pos f.BackgroundColor3 = Color3.fromRGB(15, 16, 22)
+    f.BorderSizePixel = 0 f.Active = true f.Draggable = true f.Visible = vis f.Parent = SG
+    local st = Instance.new("UIStroke") st.Thickness = 2.5 st.ApplyStrokeMode = Enum.ApplyStrokeMode.Border st.Parent = f
+    local cn = Instance.new("UICorner") cn.CornerRadius = UDim.new(0, 12) cn.Parent = f
+    return f, st
 end
-ToggleButton.MouseButton1Click:Connect(toggleMenu)
-
-local minSize, maxSize = 0.2, 5.0
-local isDragging = false
-local originalHitboxSize = Vector3.new(2, 2, 1)
-local defaultJumpPower = 50
-local defaultJumpHeight = 7.2
-
-local function resizeCharacterFE(scale)
-    scale = math.clamp(scale, minSize, maxSize)
-    local char = player.Character
-    if not char then return end
-    
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-    
-    local valueNames = {"BodyHeightScale", "BodyWidthScale", "BodyDepthScale", "HeadScale"}
-    for _, name in ipairs(valueNames) do
-        local val = hum:FindFirstChild(name)
-        if val and val:IsA("NumberValue") then 
-            val.Value = scale 
-        else
-            local newVal = Instance.new("NumberValue")
-            newVal.Name = name
-            newVal.Value = scale
-            newVal.Parent = hum
+local szMain = UDim2.new(0, 280, 0, 240) local posMain = UDim2.new(0.5, -140, 0.4, -120)
+local MF, UIStroke = makeFrame(szMain, posMain, false)
+local WF, WelcomeStroke = makeFrame(szMain, posMain, true)
+local function makeLabel(p, sz, pos, txt, col, ts)
+    local l = Instance.new("TextLabel") l.Size = sz l.Position = pos l.Text = txt l.TextColor3 = col
+    l.BackgroundTransparency = 1 l.Font = Enum.Font.GothamBold l.TextSize = ts l.Parent = p return l
+end
+makeLabel(WF, UDim2.new(1, 0, 0, 50), UDim2.new(0, 0, 0, 30), "MICHIFLUX PLUS", Color3.fromRGB(255, 255, 255), 18)
+makeLabel(WF, UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 75), "Advanced Resize & Hitbox FE", Color3.fromRGB(0, 200, 255), 11)
+local function makeBtn(p, sz, pos, txt, bg)
+    local b = Instance.new("TextButton") b.Size = sz b.Position = pos b.BackgroundColor3 = bg
+    b.TextColor3 = Color3.fromRGB(255, 255, 255) b.Text = txt b.Font = Enum.Font.GothamBold b.TextSize = 12
+    b.BorderSizePixel = 0 b.Parent = p local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 8) c.Parent = b
+    return b
+end
+local StartBtn = makeBtn(WF, UDim2.new(0, 200, 0, 45), UDim2.new(0.5, -100, 0, 135), "START", Color3.fromRGB(0, 160, 100))
+local ToggleButton = makeBtn(SG, UDim2.new(0, 120, 0, 35), UDim2.new(0, 15, 0, 15), "MICHIFLUX [OCULTAR]", Color3.fromRGB(15, 16, 22))
+ToggleButton.Visible = false local ToggleStroke = Instance.new("UIStroke") ToggleStroke.Thickness = 2.5
+ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border ToggleStroke.Parent = ToggleButton
+makeLabel(MF, UDim2.new(1, 0, 0, 40), UDim2.new(0, 0, 0, 0), "MICHIFLUX PLUS [FE]", Color3.fromRGB(255, 255, 255), 14)
+local ValueLabel = makeLabel(MF, UDim2.new(1, 0, 0, 25), UDim2.new(0, 0, 0, 40), "Escala: 1.00x (Normal)", Color3.fromRGB(0, 200, 255), 13)
+local SliderBg = Instance.new("Frame") SliderBg.Size = UDim2.new(0, 230, 0, 6) SliderBg.Position = UDim2.new(0, 25, 0, 85)
+SliderBg.BackgroundColor3 = Color3.fromRGB(35, 38, 48) SliderBg.Parent = MF
+local SliderBtn = Instance.new("TextButton") SliderBtn.Size = UDim2.new(0, 16, 0, 16) SliderBtn.Position = UDim2.new(0.038, -8, 0, -5)
+SliderBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 255) SliderBtn.Text = "" SliderBtn.Parent = SliderBg
+local rc = Instance.new("UICorner") rc.CornerRadius = UDim.new(1, 0) rc.Parent = SliderBtn
+local TextBox = Instance.new("TextBox") TextBox.Size = UDim2.new(0, 110, 0, 35) TextBox.Position = UDim2.new(0, 25, 0, 115)
+TextBox.BackgroundColor3 = Color3.fromRGB(24, 26, 36) TextBox.TextColor3 = Color3.fromRGB(255, 255, 255) TextBox.Text = "1.0"
+TextBox.ClearTextOnFocus = false TextBox.Font = Enum.Font.Gotham TextBox.TextSize = 13 TextBox.Parent = MF
+local tbc = Instance.new("UICorner") tbc.CornerRadius = UDim.new(0, 6) tbc.Parent = TextBox
+local ApplyBtn = makeBtn(MF, UDim2.new(0, 110, 0, 35), UDim2.new(0, 145, 0, 115), "APLICAR", Color3.fromRGB(0, 160, 100))
+local ResetBtn = makeBtn(MF, UDim2.new(0, 230, 0, 42), UDim2.new(0, 25, 0, 170), "REINICIAR TAMAÑO (1.0x)", Color3.fromRGB(180, 30, 50))
+RS.RenderStepped:Connect(function()
+    local h = (tick() % 4) / 4 local c = Color3.fromHSV(h, 1, 1)
+    UIStroke.Color = c ToggleStroke.Color = c WelcomeStroke.Color = c
+end)
+StartBtn.MouseButton1Click:Connect(function() WF:Destroy() MF.Visible = true ToggleButton.Visible = true end)
+ToggleButton.MouseButton1Click:Connect(function()
+    MF.Visible = not MF.Visible ToggleButton.Text = MF.Visible and "MICHIFLUX [OCULTAR]" or "MICHIFLUX [MOSTRAR]"
+end)
+local minS, maxS, isDrag, oHSize = 0.2, 5.0, false, Vector3.new(2, 2, 1)
+local function resize(scale)
+    scale = math.clamp(scale, minS, maxS) local c = lp.Character if not c then return end
+    local h = c:FindFirstChildOfClass("Humanoid") if not h then return end
+    h.HipHeight = 1.35 * scale
+    for _, n in ipairs({"BodyHeightScale", "BodyWidthScale", "BodyDepthScale", "HeadScale"}) do
+        local v = h:FindFirstChild(n) if v and v:IsA("NumberValue") then v.Value = scale else
+            local nv = Instance.new("NumberValue") nv.Name = n nv.Value = scale nv.Parent = h
         end
     end
-    
-    pcall(function() char:ScaleTo(scale) end)
-    
-    local rootPart = char:FindFirstChild("HumanoidRootPart")
-    if rootPart and rootPart:IsA("BasePart") then
-        rootPart.Size = originalHitboxSize * scale
-        rootPart.Massless = true
+    pcall(function() c:ScaleTo(scale) end)
+    local rp = c:FindFirstChild("HumanoidRootPart") if rp and rp:IsA("BasePart") then rp.Size = oHSize * scale rp.Massless = true end
+    if h.UseJumpPower then h.JumpPower = 50 * math.sqrt(scale) else h.JumpHeight = 7.2 * scale end
+    local t = c:FindFirstChild("Torso") or c:FindFirstChild("LowerTorso")
+    if rp and t then local rj = rp:FindFirstChild("RootJoint") or t:FindFirstChild("Root")
+        if rj and rj:IsA("Motor6D") then rj.C0 = CFrame.new(0, 0, 0) * CFrame.Angles(rj.C0:ToEulerAnglesXYZ()) end
     end
-    
-    if hum.UseJumpPower then
-        hum.JumpPower = defaultJumpPower * math.sqrt(scale)
-    else
-        hum.JumpHeight = defaultJumpHeight * scale
-    end
-    
-    local torso = char:FindFirstChild("Torso") or char:FindFirstChild("LowerTorso")
-    if rootPart and torso then
-        local rootJoint = rootPart:FindFirstChild("RootJoint") or torso:FindFirstChild("Root")
-        if rootJoint and rootJoint:IsA("Motor6D") then
-            rootJoint.C0 = CFrame.new(0, (scale - 1) * 2, 0) * CFrame.Angles(rootJoint.C0:ToEulerAnglesXYZ())
-        end
-    end
-    
-    player.CameraMaxZoomDistance = math.clamp(400 * scale, 128, 5000)
-    player.CameraMinZoomDistance = math.clamp(0.5 * scale, 0.1, 10)
-    hum.CameraOffset = Vector3.new(0, (scale - 1) * 2, 0)
+    lp.CameraMaxZoomDistance = math.clamp(400 * scale, 128, 5000)
+    lp.CameraMinZoomDistance = math.clamp(0.5 * scale, 0.1, 10) h.CameraOffset = Vector3.new(0, (scale - 1) * 2, 0)
 end
-
-local function updateSliderPosition(scale)
-    local percentage = (scale - minSize) / (maxSize - minSize)
-    SliderButton.Position = UDim2.new(math.clamp(percentage, 0, 1), -8, 0, -5)
-end
-
-SliderButton.InputBegan:Connect(function(i)
-    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDragging = true end
-end)
-UserInputService.InputEnded:Connect(function(i)
-    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDragging = false end
-end)
-
-RunService.RenderStepped:Connect(function()
-    if isDragging then
-        local mousePos = UserInputService:GetMouseLocation().X
-        local sliderX = SliderBackground.AbsolutePosition.X
-        local sliderWidth = SliderBackground.AbsoluteSize.X
-        local percentage = math.clamp((mousePos - sliderX) / sliderWidth, 0, 1)
-        SliderButton.Position = UDim2.new(percentage, -8, 0, -5)
-        
-        local calculatedScale = math.round((minSize + (percentage * (maxSize - minSize))) * 100) / 100
-        ValueLabel.Text = "Escala: " .. string.format("%.2f", calculatedScale) .. "x"
-        TextBox.Text = string.format("%.2f", calculatedScale)
-        
-        resizeCharacterFE(calculatedScale)
+local function updSld(scale) SliderBtn.Position = UDim2.new(math.clamp((scale - minS) / (maxS - minS), 0, 1), -8, 0, -5) end
+SliderBtn.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDrag = true end end)
+UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDrag = false end end)
+RS.RenderStepped:Connect(function()
+    if isDrag then
+        local p = math.clamp((UIS:GetMouseLocation().X - SliderBg.AbsolutePosition.X) / SliderBg.AbsoluteSize.X, 0, 1)
+        SliderBtn.Position = UDim2.new(p, -8, 0, -5)
+        local s = math.round((minS + (p * (maxS - minS))) * 100) / 100
+        ValueLabel.Text = "Escala: " .. string.format("%.2f", s) .. "x" TextBox.Text = string.format("%.2f", s) resize(s)
     end
 end)
-
 ApplyBtn.MouseButton1Click:Connect(function()
-    local targetScale = tonumber(TextBox.Text)
-    if targetScale then
-        targetScale = math.clamp(targetScale, minSize, maxSize)
-        TextBox.Text = string.format("%.2f", targetScale)
-        ValueLabel.Text = "Escala: " .. string.format("%.2f", targetScale) .. "x"
-        updateSliderPosition(targetScale)
-        resizeCharacterFE(targetScale) 
-    else
-        TextBox.Text = "Inválido"
-    end
+    local s = tonumber(TextBox.Text) if s then s = math.clamp(s, minS, maxS) TextBox.Text = string.format("%.2f", s)
+        ValueLabel.Text = "Escala: " .. string.format("%.2f", s) .. "x" updSld(s) resize(s) else TextBox.Text = "Inválido" end
 end)
-
-ResetBtn.MouseButton1Click:Connect(function()
-    ValueLabel.Text = "Escala: 1.00x (Normal)"
-    TextBox.Text = "1.0"
-    updateSliderPosition(1.0)
-    resizeCharacterFE(1.0)
-end)
-
+ResetBtn.MouseButton1Click:Connect(function() ValueLabel.Text = "Escala: 1.00x (Normal)" TextBox.Text = "1.0" updSld(1.0) resize(1.0) end)
