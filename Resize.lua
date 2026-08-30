@@ -1,259 +1,243 @@
--- FE MICHIFLUX PLUS EDITION (Premium RGB Border & Neon Title)
 local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
-local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
--- 1. CREACIÓN DE LA INTERFAZ VISUAL PREMIUM
+local player = Players.LocalPlayer
+local pGui = player:WaitForChild("PlayerGui")
+
+if pGui:FindFirstChild("FE_PremiumResizeHub") then
+    pGui.FE_PremiumResizeHub:Destroy()
+end
+
+-- 1. INTERFAZ GRÁFICA
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MichiFluxPlusGui"
-ScreenGui.Parent = game:CoreGui
+ScreenGui.Name = "FE_PremiumResizeHub"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = pGui
 
--- Contorno Animado Neon RGB
-local BorderFrame = Instance.new("Frame")
-BorderFrame.Name = "BorderFrame"
-BorderFrame.Parent = ScreenGui
-BorderFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-BorderFrame.BorderSizePixel = 0
-BorderFrame.Position = UDim2.new(0.5, -135, 0.4, -150)
-BorderFrame.Size = UDim2.new(0, 270, 0, 310)
-BorderFrame.Active = true
-BorderFrame.Draggable = true
-
-local BorderCorner = Instance.new("UICorner")
-BorderCorner.CornerRadius = UDim.new(0, 10)
-BorderCorner.Parent = BorderFrame
-
--- Panel Interno Oscuro
 local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = BorderFrame
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MainFrame.Size = UDim2.new(0, 280, 0, 240)
+MainFrame.Position = UDim2.new(0.5, -140, 0.4, -120)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 16, 22)
 MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0, 3, 0, 3)
-MainFrame.Size = UDim2.new(1, -6, 1, -6)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Thickness = 2.5
+UIStroke.Color = Color3.fromRGB(0, 150, 255)
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.Parent = MainFrame
 
 local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 8)
+MainCorner.CornerRadius = UDim.new(0, 12)
 MainCorner.Parent = MainFrame
 
--- Título Oficial MICHIFLUX PLUS
+-- Botón Ocultar/Mostrar
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 90, 0, 32)
+ToggleButton.Position = UDim2.new(0, 15, 0, 15)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Text = "OCULTAR"
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 12
+ToggleButton.Parent = ScreenGui
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 8)
+ToggleCorner.Parent = ToggleButton
+
+-- Componentes de Texto
 local Title = Instance.new("TextLabel")
-Title.Parent = MainFrame
-Title.BackgroundTransparency = 1
 Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Font = Enum.Font.FredokaOne
-Title.Text = "MICHIFLUX PLUS"
+Title.Text = "RESIZE ADVANCED PRO"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 20
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.Parent = MainFrame
 
--- Labels de Estado
-local CurrentSizeLabel = Instance.new("TextLabel")
-CurrentSizeLabel.Parent = MainFrame
-CurrentSizeLabel.BackgroundTransparency = 1
-CurrentSizeLabel.Position = UDim2.new(0, 15, 0, 40)
-CurrentSizeLabel.Size = UDim2.new(1, -30, 0, 15)
-CurrentSizeLabel.Font = Enum.Font.SourceSansBold
-CurrentSizeLabel.Text = "TAMAÑO ACTUAL: 1.00x"
-CurrentSizeLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
-CurrentSizeLabel.TextSize = 13
-CurrentSizeLabel.TextXAlignment = Enum.TextXAlignment.Left
+local ValueLabel = Instance.new("TextLabel")
+ValueLabel.Size = UDim2.new(1, 0, 0, 25)
+ValueLabel.Position = UDim2.new(0, 0, 0, 40)
+ValueLabel.Text = "Escala: 1.00x (Normal)"
+ValueLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+ValueLabel.BackgroundTransparency = 1
+ValueLabel.Font = Enum.Font.GothamBold
+ValueLabel.TextSize = 13
+ValueLabel.Parent = MainFrame
 
-local SelectedSizeLabel = Instance.new("TextLabel")
-SelectedSizeLabel.Parent = MainFrame
-SelectedSizeLabel.BackgroundTransparency = 1
-SelectedSizeLabel.Position = UDim2.new(0, 15, 0, 55)
-SelectedSizeLabel.Size = UDim2.new(1, -30, 0, 15)
-SelectedSizeLabel.Font = Enum.Font.SourceSansBold
-SelectedSizeLabel.Text = "TAMAÑO A APLICAR: 1.00x"
-SelectedSizeLabel.TextColor3 = Color3.fromRGB(255, 180, 0)
-SelectedSizeLabel.TextSize = 13
-SelectedSizeLabel.TextXAlignment = Enum.TextXAlignment.Left
-
--- Deslizador Estilizado
+-- Deslizador (Slider)
 local SliderBackground = Instance.new("Frame")
+SliderBackground.Size = UDim2.new(0, 230, 0, 6)
+SliderBackground.Position = UDim2.new(0, 25, 0, 85)
+SliderBackground.BackgroundColor3 = Color3.fromRGB(35, 38, 48)
 SliderBackground.Parent = MainFrame
-SliderBackground.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-SliderBackground.BorderSizePixel = 0
-SliderBackground.Position = UDim2.new(0, 15, 0, 80)
-SliderBackground.Size = UDim2.new(1, -30, 0, 10)
-
-local SliderCorner = Instance.new("UICorner")
-SliderCorner.CornerRadius = UDim.new(1, 0)
-SliderCorner.Parent = SliderBackground
 
 local SliderButton = Instance.new("TextButton")
-SliderButton.Parent = SliderBackground
-SliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-SliderButton.BorderSizePixel = 0
-SliderButton.Position = UDim2.new(0, 35, 0, -5)
-SliderButton.Size = UDim2.new(0, 20, 0, 20)
+SliderButton.Size = UDim2.new(0, 16, 0, 16)
+SliderButton.Position = UDim2.new(0.038, -8, 0, -5)
+SliderButton.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
 SliderButton.Text = ""
+SliderButton.Parent = SliderBackground
 
-local ButtonCorner = Instance.new("UICorner")
-ButtonCorner.CornerRadius = UDim.new(1, 0)
-ButtonCorner.Parent = SliderButton
+local RoundButton = Instance.new("UICorner")
+RoundButton.CornerRadius = UDim.new(1, 0)
+RoundButton.Parent = SliderButton
 
--- Entrada de Tamaño Manual
-local SizeInput = Instance.new("TextBox")
-SizeInput.Parent = MainFrame
-SizeInput.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-SizeInput.BorderSizePixel = 0
-SizeInput.Position = UDim2.new(0, 15, 0, 110)
-SizeInput.Size = UDim2.new(1, -30, 0, 30)
-SizeInput.Font = Enum.Font.SourceSansItalic
-SizeInput.PlaceholderText = "Tamaño personalizado..."
-SizeInput.Text = ""
-SizeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-SizeInput.TextSize = 14
+-- Entrada Manual e Input
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0, 110, 0, 35)
+TextBox.Position = UDim2.new(0, 25, 0, 115)
+TextBox.BackgroundColor3 = Color3.fromRGB(24, 26, 36)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.Text = "1.0"
+TextBox.ClearTextOnFocus = false
+TextBox.Font = Enum.Font.Gotham
+TextBox.TextSize = 13
+TextBox.Parent = MainFrame
 
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 6)
-InputCorner.Parent = SizeInput
+local TBCorner = Instance.new("UICorner")
+TBCorner.CornerRadius = UDim.new(0, 6)
+TBCorner.Parent = TextBox
 
--- Entrada para Nombre de Visualización (Display Name)
-local NameInput = Instance.new("TextBox")
-NameInput.Parent = MainFrame
-NameInput.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-NameInput.BorderSizePixel = 0
-NameInput.Position = UDim2.new(0, 15, 0, 150)
-NameInput.Size = UDim2.new(1, -30, 0, 35)
-NameInput.Font = Enum.Font.SourceSansBold
-NameInput.PlaceholderText = "Escribe tu Display Name aquí..."
-NameInput.Text = ""
-NameInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-NameInput.TextSize = 15
-
-local NameCorner = Instance.new("UICorner")
-NameCorner.CornerRadius = UDim.new(0, 6)
-NameCorner.Parent = NameInput
-
--- Botón de Aplicar Todo (Tamaño y Nombre)
-local ApplyButton = Instance.new("TextButton")
-ApplyButton.Parent = MainFrame
-ApplyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-ApplyButton.BorderSizePixel = 0
-ApplyButton.Position = UDim2.new(0, 15, 0, 205)
-ApplyButton.Size = UDim2.new(1, -30, 0, 45)
-ApplyButton.Font = Enum.Font.FredokaOne
-ApplyButton.Text = "APLICAR CAMBIOS"
-ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ApplyButton.TextSize = 16
+local ApplyBtn = Instance.new("TextButton")
+ApplyBtn.Size = UDim2.new(0, 110, 0, 35)
+ApplyBtn.Position = UDim2.new(0, 145, 0, 115)
+ApplyBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 100)
+ApplyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ApplyBtn.Text = "APLICAR"
+ApplyBtn.Font = Enum.Font.GothamBold
+ApplyBtn.TextSize = 12
+ApplyBtn.Parent = MainFrame
 
 local ApplyCorner = Instance.new("UICorner")
 ApplyCorner.CornerRadius = UDim.new(0, 6)
-ApplyCorner.Parent = ApplyButton
+ApplyCorner.Parent = ApplyBtn
 
--- Botón Flotante Plus
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Parent = ScreenGui
-ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-ToggleButton.Position = UDim2.new(0, 15, 0, 15)
-ToggleButton.Size = UDim2.new(0, 65, 0, 40)
-ToggleButton.Font = Enum.Font.FredokaOne
-ToggleButton.Text = "MICHI+"
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.TextSize = 12
+-- Botón Reiniciar
+local ResetBtn = Instance.new("TextButton")
+ResetBtn.Size = UDim2.new(0, 230, 0, 42)
+ResetBtn.Position = UDim2.new(0, 25, 0, 170)
+ResetBtn.BackgroundColor3 = Color3.fromRGB(180, 30, 50)
+ResetBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ResetBtn.Text = "REINICIAR TAMAÑO (1.0x)"
+ResetBtn.Font = Enum.Font.GothamBold
+ResetBtn.TextSize = 12
+ResetBtn.Parent = MainFrame
 
-local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim.new(0, 6)
-ToggleCorner.Parent = ToggleButton
+local ResetCorner = Instance.new("UICorner")
+ResetCorner.CornerRadius = UDim.new(0, 8)
+ResetCorner.Parent = ResetBtn
 
--- 2. ANIMACIÓN DE CONTORNO RGB EN VIVO + EFECTO TEXTO NEON
-local frecuencia = 0.5
+-- 2. ANIMACIÓN RGB WAVE DEL BORDE
+local isMenuRainbowActive = true
 RunService.RenderStepped:Connect(function()
-    local tiempo = tick()
-    local colorRGB = Color3.fromHSV((tiempo * frecuencia) % 1, 1, 1)
-    BorderFrame.BackgroundColor3 = colorRGB
-    SliderButton.BackgroundColor3 = colorRGB
-    Title.TextColor3 = colorRGB -- El título brilla junto al borde
+    if isMenuRainbowActive and MainFrame.Visible then
+        local hue = (tick() % 4) / 4
+        UIStroke.Color = Color3.fromHSV(hue, 1, 1)
+    end
 end)
 
--- 3. LÓGICA DE ACTUALIZACIÓN DE TAMAÑO Y NOMBRE (FE)
-local TamañoSeleccionado = 1.0
+-- Animaciones Hover simples
+local function setHover(btn, hCol, nCol)
+    btn.MouseEnter:Connect(function() btn.BackgroundColor3 = hCol end)
+    btn.MouseLeave:Connect(function() btn.BackgroundColor3 = nCol end)
+end
+setHover(ToggleButton, Color3.fromRGB(0, 150, 255), Color3.fromRGB(0, 120, 255))
+setHover(ApplyBtn, Color3.fromRGB(0, 190, 120), Color3.fromRGB(0, 160, 100))
+setHover(ResetBtn, Color3.fromRGB(220, 40, 70), Color3.fromRGB(180, 30, 50))
 
-local function AplicarTodo(FactorTamaño, NuevoNombre)
-    local Char = LP.Character
-    if not Char then return end
-    local Hum = Char:FindFirstChildOfClass("Humanoid")
-    if not Hum then return end
-
-    if NuevoNombre and NuevoNombre ~= "" then
-        Hum.DisplayName = NuevoNombre
+-- 3. LÓGICA DE APERTURA / CIERRE
+local function toggleMenu()
+    MainFrame.Visible = not MainFrame.Visible
+    if MainFrame.Visible then
+        ToggleButton.Text = "OCULTAR"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+        isMenuRainbowActive = true
+    else
+        ToggleButton.Text = "MOSTRAR"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+        isMenuRainbowActive = false
     end
+end
 
-    for _, parte in pairs(Char:GetChildren()) do
-        if parte:IsA("BasePart") or parte:IsA("MeshPart") then
-            for _, v in pairs(parte:GetChildren()) do
-                if v.Name == "OriginalSize" or v.Name == "OriginalPosition" then
-                    v:Destroy()
-                end
+ToggleButton.MouseButton1Click:Connect(toggleMenu)
+UserInputService.InputBegan:Connect(function(input, gp)
+    if not gp and input.KeyCode == Enum.KeyCode.Q then toggleMenu() end
+end)
+
+-- 4. LÓGICA REPLICACIÓN FE Y CÁMARA
+local minSize, maxSize = 0.05, 25.0
+local isDragging = false
+
+local function resizeCharacter(scale)
+    scale = math.clamp(scale, minSize, maxSize)
+    local character = player.Character
+    if character then
+        pcall(function() character:ScaleTo(scale) end)
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            local vars = {"BodyHeightScale", "BodyWidthScale", "BodyDepthScale", "HeadScale"}
+            for _, v in pairs(vars) do
+                local val = humanoid:FindFirstChild(v)
+                if val and val:IsA("NumberValue") then val.Value = scale end
             end
+            player.CameraMaxZoomDistance = math.clamp(400 * scale, 128, 5000)
+            player.CameraMinZoomDistance = math.clamp(0.5 * scale, 0.1, 10)
+            humanoid.CameraOffset = Vector3.new(0, (scale - 1) * 2, 0)
         end
     end
+end
 
-    if Hum:FindFirstChild("HeadScale") then
-        Hum.HeadScale.Value = FactorTamaño
-        Hum.BodyWidthScale.Value = FactorTamaño
-        Hum.BodyDepthScale.Value = FactorTamaño
-        Hum.BodyHeightScale.Value = FactorTamaño
-        CurrentSizeLabel.Text = "TAMAÑO ACTUAL: " .. string.format("%.2f", FactorTamaño) .. "x"
+local function updateSliderPosition(scale)
+    local percentage = (scale - minSize) / (maxSize - minSize)
+    SliderButton.Position = UDim2.new(math.clamp(percentage, 0, 1), -8, 0, -5)
+end
+
+-- Controles del Slider
+SliderButton.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDragging = true end
+end)
+UserInputService.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then isDragging = false end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if isDragging then
+        local mousePos = UserInputService:GetMouseLocation().X
+        local sliderX = SliderBackground.AbsolutePosition.X
+        local sliderWidth = SliderBackground.AbsoluteSize.X
+        local percentage = math.clamp((mousePos - sliderX) / sliderWidth, 0, 1)
+        SliderButton.Position = UDim2.new(percentage, -8, 0, -5)
+        local calculatedScale = math.round((minSize + (percentage * (maxSize - minSize))) * 100) / 100
+        ValueLabel.Text = "Escala: " .. string.format("%.2f", calculatedScale) .. "x"
+        TextBox.Text = string.format("%.2f", calculatedScale)
+        resizeCharacter(calculatedScale)
+    end
+end)
+
+ApplyBtn.MouseButton1Click:Connect(function()
+    local targetScale = tonumber(TextBox.Text)
+    if targetScale then
+        targetScale = math.clamp(targetScale, minSize, maxSize)
+        TextBox.Text = string.format("%.2f", targetScale)
+        ValueLabel.Text = "Escala: " .. string.format("%.2f", targetScale) .. "x"
+        updateSliderPosition(targetScale)
+        resizeCharacter(targetScale)
     else
-        CurrentSizeLabel.Text = "¡ERROR: USA AVATAR R15!"
-    end
-end
-
--- 4. INTERACTIVIDAD DEL DESLIZADOR
-local arrastrando = false
-local MinTamaño = 0.1
-local MaxTamaño = 8.0
-
-SliderButton.MouseButton1Down:Connect(function() arrastrando = true end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        arrastrando = false
+        TextBox.Text = "Inválido"
     end
 end)
 
-UserInputService.InputChanged:Connect(function(input)
-    if arrastrando and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local MousePos = input.Position.X
-        local SliderPos = SliderBackground.AbsolutePosition.X
-        local SliderWidth = SliderBackground.AbsoluteSize.X
-        
-        local Porcentaje = math.clamp((MousePos - SliderPos) / SliderWidth, 0, 1)
-        SliderButton.Position = UDim2.new(Porcentaje, -10, 0, -5)
-        
-        TamañoSeleccionado = MinTamaño + (Porcentaje * (MaxTamaño - MinTamaño))
-        SelectedSizeLabel.Text = "TAMAÑO A APLICAR: " .. string.format("%.2f", TamañoSeleccionado) .. "x"
-        SizeInput.Text = ""
-    end
-end)
-
--- 5. INTERACTIVIDAD MANUAL DE TEXTO
-SizeInput:GetPropertyChangedSignal("Text"):Connect(function()
-    local NumeroIngresado = tonumber(SizeInput.Text)
-    if NumeroIngresado and NumeroIngresado > 0 then
-        if NumeroIngresado > 20 then NumeroIngresado = 20 end
-        TamañoSeleccionado = NumeroIngresado
-        SelectedSizeLabel.Text = "TAMAÑO A APLICAR: " .. string.format("%.2f", TamañoSeleccionado) .. "x"
-    end
-end)
-
--- 6. BOTÓN APLICAR Y CONTROLES DE VISIBILIDAD (BOTÓN Y TECLA P)
-ApplyButton.MouseButton1Click:Connect(function()
-    AplicarTodo(TamañoSeleccionado, NameInput.Text)
-end)
-
-local function AlternarMenu()
-    BorderFrame.Visible = not BorderFrame.Visible
-end
-
-ToggleButton.MouseButton1Click:Connect(AlternarMenu)
-
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.P then
-        AlternarMenu()
-    end
+ResetBtn.MouseButton1Click:Connect(function()
+    ValueLabel.Text = "Escala: 1.00x (Normal)"
+    TextBox.Text = "1.0"
+    updateSliderPosition(1.0)
+    resizeCharacter(1.0)
+    player.CameraMaxZoomDistance = 400
+    player.CameraMinZoomDistance = 0.5
 end)
