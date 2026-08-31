@@ -1,260 +1,93 @@
--- ============================================================
--- SCRIPT OFICIAL: MichiFlux Plus [FE] (Edición Comunitaria)
--- REPOSITORIO: michijuegagd-dot/MICHIFLUX-PLUS
--- ACCESO LIBRE - SIN LLAVES / NO KEY SYSTEM
--- ============================================================
+local P, CG, UIS, LS, RS, TS = game:GetService("Players"), game:GetService("CoreGui"), game:GetService("UserInputService"), game:GetService("LocalizationService"), game:GetService("RunService"), game:GetService("TweenService")
+local p, id = P.LocalPlayer, LS.RobloxLocaleId:sub(1,2)
+local T = { es = {b="¡BIENVENIDO!", s="Deslizar: ", m="Manual:", a="APLICAR", r="RESET", i="EMPEZAR SCRIPT"}, en = {b="WELCOME!", s="Slider: ", m="Manual:", a="APPLY", r="RESET", i="START SCRIPT"} }
+local l = T[id] or T.en local size, mn, mx = 1.00, 0.01, 25.00
 
-local TweenService = game:GetService("TweenService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+if CG:FindFirstChild("MFP") then CG.MFP:Destroy() end
+local sg = Instance.new("ScreenGui", CG) sg.Name = "MFP" sg.ResetOnSpawn = false
 
--- Evita ejecuciones duplicadas e interferencias
-if PlayerGui:FindFirstChild("MichiFluxPlusGUI") then
-    PlayerGui.MichiFluxPlusGUI:Destroy()
-end
+-- INTERFAZ PRINCIPAL
+local mf = Instance.new("Frame", sg) mf.Size = UDim2.new(0,260,0,260) mf.Position = UDim2.new(0.5,-130,0.4,-130) mf.BackgroundColor3 = Color3.fromRGB(15,15,25) mf.Visible = false mf.Active = true mf.Draggable = true Instance.new("UICorner", mf)
+local str = Instance.new("UIStroke", mf) str.Thickness = 3
 
--- Mensaje de bienvenida directo en la consola/chat del jugador
-pcall(function()
-    game:GetService("StarterGui"):SetCore("StarterGuiService", {
-        Title = "MichiFlux Plus";
-        Text = "¡Script ejecutado con éxito!";
-        Duration = 5;
-    })
+local ob = Instance.new("TextButton", sg) ob.Size = UDim2.new(0,50,0,50) ob.Position = UDim2.new(0,10,0.5,-25) ob.BackgroundColor3 = Color3.fromRGB(15,15,25) ob.Text = "🧬" ob.TextSize = 24 ob.TextColor3 = Color3.fromRGB(255,255,255) ob.Font = Enum.Font.SourceSansBold ob.Visible = false ob.Active = true ob.Draggable = true Instance.new("UICorner", ob) local obst = Instance.new("UIStroke", ob) obst.Thickness = 3
+
+local tl = Instance.new("TextLabel", mf) tl.Size = UDim2.new(1,0,0,35) tl.BackgroundColor3 = Color3.fromRGB(25,25,35) tl.Text = "  MichiFlux" tl.TextSize = 16 tl.Font = Enum.Font.SourceSansBold tl.TextXAlignment = 0 Instance.new("UICorner", tl)
+local mb = Instance.new("TextButton", mf) mb.Size = UDim2.new(0,30,0,30) mb.Position = UDim2.new(1,-35,0,2) mb.BackgroundTransparency = 1 mb.Text = "—" mb.TextColor3 = Color3.fromRGB(200,200,200) mb.TextSize = 16 mb.Font = 4 mb.MouseButton1Click:Connect(function() mf.Visible = false ob.Visible = true end)
+ob.MouseButton1Click:Connect(function() ob.Visible = false mf.Visible = true end)
+
+local sl = Instance.new("TextLabel", mf) sl.Size = UDim2.new(1,-20,0,25) sl.Position = UDim2.new(0,10,0,50) sl.BackgroundTransparency = 1 sl.Text = l.s.."1.00x" sl.TextColor3 = Color3.fromRGB(200,200,200) sl.TextXAlignment = 0
+local sf = Instance.new("Frame", mf) sf.Size = UDim2.new(1,-20,0,8) sf.Position = UDim2.new(0,10,0,80) sf.BackgroundColor3 = Color3.fromRGB(40,40,50)
+local sb = Instance.new("TextButton", sf) sb.Size = UDim2.new(0,16,0,16) sb.Text = "" Instance.new("UICorner", sb)
+
+local ml = Instance.new("TextLabel", mf) ml.Size = UDim2.new(1,-20,0,25) ml.Position = UDim2.new(0,10,0,105) ml.BackgroundTransparency = 1 ml.Text = l.m ml.TextColor3 = Color3.fromRGB(200,200,200)
+local tb = Instance.new("TextBox", mf) tb.Size = UDim2.new(1,-20,0,35) tb.Position = UDim2.new(0,10,0,130) tb.BackgroundColor3 = Color3.fromRGB(30,30,40) tb.TextColor3 = Color3.fromRGB(255,255,255) tb.Text = "1.00" tb.TextSize = 16 Instance.new("UICorner", tb) local bst = Instance.new("UIStroke", tb)
+
+local ab = Instance.new("TextButton", mf) ab.Size = UDim2.new(0,115,0,40) ab.Position = UDim2.new(0,10,0,185) ab.TextColor3 = Color3.fromRGB(255,255,255) ab.Text = l.a ab.Font = 4 ab.TextSize = 16 Instance.new("UICorner", ab) local abst = Instance.new("UIStroke", ab)
+local rb = Instance.new("TextButton", mf) rb.Size = UDim2.new(0,115,0,40) rb.Position = UDim2.new(0,135,0,185) rb.TextColor3 = Color3.fromRGB(255,255,255) rb.Text = l.r rb.Font = 4 rb.TextSize = 16 Instance.new("UICorner", rb) local rbst = Instance.new("UIStroke", rb)
+
+-- PANTALLA DE BIENVENIDA
+local wbg = Instance.new("Frame", sg) wbg.Size = UDim2.new(1,0,1,0) wbg.BackgroundColor3 = Color3.fromRGB(10,10,15) wbg.BackgroundTransparency = 0.15
+local cf = Instance.new("Frame", wbg) cf.Size = UDim2.new(0,340,0,220) cf.Position = UDim2.new(0.5,-170,0.5,-110) cf.BackgroundColor3 = Color3.fromRGB(18,18,28) Instance.new("UICorner", cf) local cst = Instance.new("UIStroke", cf) cst.Thickness = 4
+local wl = Instance.new("TextLabel", cf) wl.Size = UDim2.new(1,0,0,30) wl.Position = UDim2.new(0,0,0,20) wl.BackgroundTransparency = 1 wl.Text = l.b wl.TextColor3 = Color3.fromRGB(200,200,200) wl.Font = 4
+local ft = Instance.new("TextLabel", cf) ft.Size = UDim2.new(1,0,0,50) ft.Position = UDim2.new(0,0,0,50) ft.BackgroundTransparency = 1 ft.Text = "MichiFlux Plus" ft.TextSize = 32 ft.Font = 4
+local stb = Instance.new("TextButton", cf) stb.Size = UDim2.new(0,180,0,45) stb.Position = UDim2.new(0.5,-90,0,130) stb.TextColor3 = Color3.fromRGB(255,255,255) stb.Text = l.i stb.TextSize = 16 stb.Font = 4 Instance.new("UICorner", stb) local sst = Instance.new("UIStroke", stb) sst.Thickness = 2
+
+-- BUCLE EFECTO ARCOÍRIS
+RS.RenderStepped:Connect(function()
+    local rgb = Color3.fromHSV((tick() * 0.4) % 1, 0.8, 1) local drk = Color3.fromRGB(rgb.R * 30, rgb.G * 30, rgb.B * 30)
+    str.Color, obst.Color, bst.Color, abst.Color, rbst.Color, sb.BackgroundColor3, tl.TextColor3 = rgb, rgb, rgb, rgb, rgb, rgb, rgb
+    cst.Color, sst.Color, ft.TextColor3, stb.BackgroundColor3 = rgb, rgb, rgb, drk
 end)
 
--- 1. CREACIÓN DE CONTENEDORES (SCREEN GUI)
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MichiFluxPlusGUI"
-ScreenGui.Parent = PlayerGui
-ScreenGui.ResetOnSpawn = false
-
--- 2. PANTALLA DE BIENVENIDA (INTRO)
-local WelcomeFrame = Instance.new("Frame")
-WelcomeFrame.Size = UDim2.new(0, 360, 0, 240)
-WelcomeFrame.Position = UDim2.new(0.5, -180, 0.5, -120)
-WelcomeFrame.BackgroundColor3 = Color3.fromRGB(11, 14, 18)
-WelcomeFrame.BorderSizePixel = 0
-WelcomeFrame.Parent = ScreenGui
-
-local WelcomeCorner = Instance.new("UICorner", WelcomeFrame)
-WelcomeCorner.CornerRadius = UDim.new(0, 12)
-
-local WelcomeStroke = Instance.new("UIStroke", WelcomeFrame)
-WelcomeStroke.Thickness = 2
-WelcomeStroke.Color = Color3.fromRGB(235, 12, 100)
-
-local WelcomeTitle = Instance.new("TextLabel")
-WelcomeTitle.Size = UDim2.new(1, 0, 0, 50)
-WelcomeTitle.Position = UDim2.new(0, 0, 0, 20)
-WelcomeTitle.BackgroundTransparency = 1
-WelcomeTitle.Text = "MichiFlux Plus [FE]"
-WelcomeTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-WelcomeTitle.TextSize = 24
-WelcomeTitle.Font = Enum.Font.GothamBold
-WelcomeTitle.Parent = WelcomeFrame
-
-local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(1, 0, 0, 30)
-StatusLabel.Position = UDim2.new(0, 0, 0, 75)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Conectando al servidor comunitario..."
-StatusLabel.TextColor3 = Color3.fromRGB(0, 180, 216)
-StatusLabel.TextSize = 14
-StatusLabel.Font = Enum.Font.GothamMedium
-StatusLabel.Parent = WelcomeFrame
-
-local AngresarBtn = Instance.new("TextButton")
-AngresarBtn.Size = UDim2.new(0, 160, 0, 40)
-AngresarBtn.Position = UDim2.new(0.5, -80, 0, 130)
-AngresarBtn.BackgroundColor3 = Color3.fromRGB(0, 168, 104)
-AngresarBtn.Text = "INGRESAR"
-AngresarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AngresarBtn.TextSize = 14
-AngresarBtn.Font = Enum.Font.GothamBold
-AngresarBtn.Visible = false
-AngresarBtn.Parent = WelcomeFrame
-Instance.new("UICorner", AngresarBtn).CornerRadius = UDim.new(0, 6)
-
--- 3. INTERFAZ PRINCIPAL (MICHIFLUX PLUS [FE])
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 280, 0, 200)
-MainFrame.Position = UDim2.new(0.5, -140, 0.5, -100)
-MainFrame.BackgroundColor3 = Color3.fromRGB(11, 14, 18)
-MainFrame.BorderSizePixel = 0
-MainFrame.Visible = false
-MainFrame.Parent = ScreenGui
-
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
-local MainStroke = Instance.new("UIStroke", MainFrame)
-MainStroke.Thickness = 2
-MainStroke.Color = Color3.fromRGB(235, 12, 100)
-
-local MainTitle = Instance.new("TextLabel")
-MainTitle.Size = UDim2.new(1, 0, 0, 40)
-MainTitle.Position = UDim2.new(0, 0, 0, 10)
-MainTitle.BackgroundTransparency = 1
-MainTitle.Text = "MichiFlux Plus [FE]"
-MainTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-MainTitle.TextSize = 18
-MainTitle.Font = Enum.Font.GothamBold
-MainTitle.Parent = MainFrame
-
-local Subtitle = Instance.new("TextLabel")
-Subtitle.Size = UDim2.new(1, 0, 0, 20)
-Subtitle.Position = UDim2.new(0, 0, 0, 45)
-Subtitle.BackgroundTransparency = 1
-Subtitle.Text = "RESIZE ADVANCED PRO"
-Subtitle.TextColor3 = Color3.fromRGB(0, 180, 216)
-Subtitle.TextSize = 12
-Subtitle.Font = Enum.Font.GothamMedium
-Subtitle.Parent = MainFrame
-
-local AplicarBtn = Instance.new("TextButton")
-AplicarBtn.Size = UDim2.new(0, 100, 0, 35)
-AplicarBtn.Position = UDim2.new(0.5, 5, 0, 100)
-AplicarBtn.BackgroundColor3 = Color3.fromRGB(0, 168, 104)
-AplicarBtn.Text = "APLICAR"
-AplicarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AplicarBtn.Font = Enum.Font.GothamBold
-AplicarBtn.TextSize = 12
-AplicarBtn.Parent = MainFrame
-Instance.new("UICorner", AplicarBtn).CornerRadius = UDim.new(0, 6)
-
-local ReiniciarBtn = Instance.new("TextButton")
-ReiniciarBtn.Size = UDim2.new(0, 210, 0, 35)
-ReiniciarBtn.Position = UDim2.new(0.5, -105, 0, 145)
-ReiniciarBtn.BackgroundColor3 = Color3.fromRGB(190, 30, 45)
-ReiniciarBtn.Text = "REINICIAR TAMAÑO (1.0x)"
-ReiniciarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ReiniciarBtn.Font = Enum.Font.GothamBold
-ReiniciarBtn.TextSize = 11
-ReiniciarBtn.Parent = MainFrame
-Instance.new("UICorner", ReiniciarBtn).CornerRadius = UDim.new(0, 6)
-
-local ScaleTextBox = Instance.new("TextBox")
-ScaleTextBox.Size = UDim2.new(0, 100, 0, 35)
-ScaleTextBox.Position = UDim2.new(0.5, -105, 0, 100)
-ScaleTextBox.BackgroundColor3 = Color3.fromRGB(20, 24, 30)
-ScaleTextBox.Text = "0.5"
-ScaleTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-ScaleTextBox.Font = Enum.Font.GothamMedium
-ScaleTextBox.TextSize = 14
-ScaleTextBox.Parent = MainFrame
-Instance.new("UICorner", ScaleTextBox).CornerRadius = UDim.new(0, 6)
-
--- 4. BOTÓN DE MINIMIZAR (AZUL)
-local OcultarBtn = Instance.new("TextButton")
-OcultarBtn.Size = UDim2.new(0, 90, 0, 35)
-OcultarBtn.Position = UDim2.new(0, 20, 0, 20)
-OcultarBtn.BackgroundColor3 = Color3.fromRGB(0, 119, 182)
-OcultarBtn.Text = "OCULTAR"
-OcultarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-OcultarBtn.TextSize = 12
-OcultarBtn.Font = Enum.Font.GothamBold
-OcultarBtn.Visible = false
-OcultarBtn.Parent = ScreenGui
-Instance.new("UICorner", OcultarBtn).CornerRadius = UDim.new(0, 6)
-
--- ============================================================
--- 5. LÓGICA REPLICA FE Y VARIABLES AUTOMÁTICAS
--- ============================================================
-local function transformarTamanoFE(escala)
-    local char = LocalPlayer.Character
-    if not char then return end
-    
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-
-    local velocidadBase = 16
-    local saltoBase = 50
-
-    for _, v in pairs(char:GetDescendants()) do
-        if v:IsA("Attachment") then
-            local origPos = v:FindFirstChild("OriginalPosition") or Instance.new("Vector3Value", v)
-            if origPos.Name ~= "OriginalPosition" then
-                origPos.Name = "OriginalPosition"
-                origPos.Value = v.Position
+-- SISTEMA AVANZADO MOTOR6D BYPASS FE
+local function szBypass(e)
+    local c = p.Character if not c then return end
+    local h = c:WaitForChild("Humanoid", 5)
+    if h and h:FindFirstChild("BodyHeightScale") then
+        h.BodyHeightScale.Value, h.BodyWidthScale.Value, h.BodyDepthScale.Value, h.HeadScale.Value = e, e, e, e
+        for _, v in pairs(c:GetDescendants()) do
+            if v:IsA("Motor6D") and v.Name ~= "RootJoint" then
+                local p0, p1, c0, c1 = v.Part0, v.Part1, v.C0, v.C1
+                if p0 and p1 then
+                    v:Destroy() task.spawn(function()
+                        while p.Character == c and task.wait() do
+                            if p0 and p1 and p0.Parent and p1.Parent then
+                                p1.Velocity = Vector3.new(0, 26, 0) p.MaximumSimulationRadius, p.SimulationRadius = math.huge, math.huge
+                                p1.CFrame = p0.CFrame * c0 * CFrame.new(v.Transform.Position * e) * c1:Inverse()
+                            end
+                        end
+                    end)
+                end
             end
-            v.Position = origPos.Value * escala
-        elseif v:IsA("Motor6D") then
-            local origC0 = v:FindFirstChild("OriginalC0") or Instance.new("CFrameValue", v)
-            if origC0.Name ~= "OriginalC0" then
-                origC0.Name = "OriginalC0"
-                origC0.Value = v.C0
-            end
-            v.C0 = origC0.Value * CFrame.new(origC0.Value.Position * (escala - 1))
         end
+        p.CameraMaxZoomDistance, p.CameraMinZoomDistance = 400, 0.5
     end
-    
-    if escala > 1.0 then
-        hum.WalkSpeed = velocidadBase * (escala * 0.85)
-        hum.JumpPower = saltoBase * math.sqrt(escala)
-    elseif escala < 1.0 then
-        hum.WalkSpeed = velocidadBase * math.clamp(escala * 1.2, 0.4, 1.0)
-        hum.JumpPower = saltoBase * math.clamp(math.sqrt(escala), 0.5, 1.0)
-    else
-        hum.WalkSpeed = velocidadBase
-        hum.JumpPower = saltoBase
-    end
-    
-    hum.HipHeight = 1.35 * escala
 end
 
--- ============================================================
--- 6. CONTROLADORES E INTERACCIONES
--- ============================================================
-local menuAbierto = true
-local tamanoOriginalMain = MainFrame.Size
-
-task.spawn(function()
-	task.wait(1.0)
-	StatusLabel.Text = "Descargando módulos FE activos..."
-	task.wait(0.8)
-	StatusLabel.Text = "¡Acceso Libre Permitido!"
-	task.wait(0.3)
-	AngresarBtn.Visible = true
+stb.MouseButton1Click:Connect(function()
+    local fd = TweenInfo.new(0.3)
+    TS:Create(wbg, fd, {BackgroundTransparency = 1}):Play() TS:Create(cf, fd, {BackgroundTransparency = 1}):Play() TS:Create(wl, fd, {TextTransparency = 1}):Play() TS:Create(ft, fd, {TextTransparency = 1}):Play() TS:Create(stb, fd, {BackgroundTransparency = 1, TextTransparency = 1}):Play() TS:Create(cst, fd, {Transparency = 1}):Play() TS:Create(sst, fd, {Transparency = 1}):Play()
+    task.wait(0.3) wbg:Destroy() mf.Visible = true
 end)
 
-AngresarBtn.MouseButton1Click:Connect(function()
-	WelcomeFrame:Destroy()
-	MainFrame.Visible = true
-	OcultarBtn.Visible = true
+p.CharacterAdded:Connect(function(c) local h = c:WaitForChild("Humanoid", 5) if h then task.wait(0.5) szBypass(size) end end)
+rb.MouseButton1Click:Connect(function() size = 1.00 tb.Text = "1.00" sl.Text = l.s.."1.00x" sb.Position = UDim2.new((1.00-mn)/(mx-mn), -8, 0.5, -8) if p.Character and p.Character:FindFirstChildOfClass("Humanoid") then p.Character:FindFirstChildOfClass("Humanoid"):ChangeState(15) end end)
+
+local drag = false
+sb.MouseButton1Down:Connect(function() drag = true end)
+UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = false end end)
+UIS.InputChanged:Connect(function(input)
+    if drag and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local pct = math.clamp((input.Position.X - sf.AbsolutePosition.X) / sf.AbsoluteSize.X, 0, 1) sb.Position = UDim2.new(pct, -8, 0.5, -8)
+        size = math.round((mn + (pct * (mx - mn))) * 100) / 100 sl.Text = l.s..string.format("%.2f", size).."x" tb.Text = string.format("%.2f", size)
+    end
+end)
+tb.FocusLost:Connect(function()
+    local v = tonumber(tb.Text) if v then size = math.clamp(v, mn, mx) tb.Text = string.format("%.2f", size) sl.Text = l.s..string.format("%.2f", size).."x" sb.Position = UDim2.new((size-mn)/(mx-mn), -8, 0.5, -8) else tb.Text = string.format("%.2f", size) end
 end)
 
-OcultarBtn.MouseButton1Click:Connect(function()
-	local tInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad)
-	if menuAbierto then
-		menuAbierto = false
-		OcultarBtn.Text = "MOSTRAR"
-		TweenService:Create(MainFrame, tInfo, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}):Play()
-	else
-		menuAbierto = true
-		OcultarBtn.Text = "OCULTAR"
-		TweenService:Create(MainFrame, tInfo, {Size = tamanoOriginalMain, BackgroundTransparency = 0}):Play()
-	end
-end)
-
-AplicarBtn.MouseButton1Click:Connect(function()
-	local num = tonumber(ScaleTextBox.Text)
-	if num then 
-		transformarTamanoFE(num) 
-	end
-end)
-
-ReiniciarBtn.MouseButton1Click:Connect(function()
-	ScaleTextBox.Text = "1.0"
-	transformarTamanoFE(1.0)
-end)
-
--- Efecto RGB Optimizado (Menor consumo de CPU)
-task.spawn(function()
-	local h = 0
-	while ScreenGui and ScreenGui.Parent do
-		h = (h + (1/4) * 0.05) % 1
-		local col = Color3.fromHSV(h, 1, 1)
-		if WelcomeFrame and WelcomeFrame.Parent then WelcomeStroke.Color = col end
-		if MainFrame and MainFrame.Parent then MainStroke.Color = col end
-		task.wait(0.02) -- Pequeño delay de optimización anti-lag
-	end
+-- EJECUCIÓN INMEDIATA AL PRESIONAR
+ab.MouseButton1Click:Connect(function()
+    szBypass(size)
 end)
